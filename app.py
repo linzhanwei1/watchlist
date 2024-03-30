@@ -30,9 +30,17 @@ class Movie(db.Model):
 
 @app.route('/')
 def index():
-    user=User.query.first()         # 读取用户记录
     movies=Movie.query.all()        # 读取所有电影记录
-    return render_template('index.html', user=user, movies=movies)
+    return render_template('index.html', movies=movies)
+
+@app.errorhandler(404)      # 传入要处理的错误代码
+def page_not_found(e):      # 接收异常对象作为参数
+    return render_template('404.html'), 404  # 返回模板和状态码
+
+@app.context_processor
+def inject_user():      # 函数名可以随意修改
+    user=User.query.first()
+    return dict(user=user)    # 需要返回字典，等同于 return {'user': user}
 
 @app.cli.command() #注册为命令，可以传入 name 参数来自定义命令
 @click.option('--drop', is_flag=True, help='Create after drop.') # 设置选项
